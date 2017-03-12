@@ -12,10 +12,9 @@ struct Node {
 typedef PtrToNode List;
 
 List insert(int n,List l) {
-	struct Node *p = (PtrToNode)malloc(sizeof(struct Node));
+	struct Node *p = (List)malloc(sizeof(struct Node)*n);
 	for (int i = 0; i < n; i+=2) {
-		scanf("%d", &p->coef);
-		scanf("%d", &p->expon);
+		scanf("%d %d", &p->coef, &p->expon);
 		p = p->Next;
 	}
 	return l;
@@ -32,6 +31,5 @@ int main()
 	insert(N, L1);
 	scanf("%d", &N);
 	insert(N, L2);
-	printf("%s", N);
 	system("pause");
 }
