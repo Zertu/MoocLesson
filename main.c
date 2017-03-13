@@ -39,6 +39,7 @@ int main()
 	int N;
 	scanf("%d", &N);
 	insert(N, L1);
-	printlist(L1);
+	scanf("%d", &N);
+	insert(N, L2);
 	system("pause");
 }
