@@ -5,7 +5,9 @@
 
 typedef struct Node *PtrToNode;
 struct Node {
+	//系数
 	int coef;
+	//指数
 	int expon;
 	PtrToNode Next;
 };
@@ -34,6 +36,24 @@ void printlist(List l) {
 	}
 	return;
 }
+
+List mul(List a, List b) {
+	List l = (List)malloc(sizeof(struct Node));
+	l->Next = NULL;
+	List n1 = a->Next, n2 = b->Next, p = l;
+	while (n1) {
+		while (n2) {
+			p->Next = (PtrToNode)malloc(sizeof(struct Node));
+			p = p->Next;
+			p->expon = n1->expon + n2->expon;
+			p->coef = n1->coef*n2->coef;
+			p->Next = NULL;
+			n2 = n2->Next;
+		}
+		n1 = n1->Next;
+	}
+	return l;
+}
 int main()
 {	
 	int N;
@@ -41,5 +61,6 @@ int main()
 	insert(N, L1);
 	scanf("%d", &N);
 	insert(N, L2);
+	mul(L1, L2);
 	system("pause");
 }
