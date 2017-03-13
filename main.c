@@ -1,66 +1,128 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <Windows.h>
-#include <stdbool.h>
+#include <ctype.h>
 
-typedef struct Node *PtrToNode;
+#define MAXLINE 4096
+
+typedef struct Node *PtrNode;
 struct Node {
-	//系数
 	int coef;
-	//指数
 	int expon;
-	PtrToNode Next;
+	PtrNode Next;
 };
-typedef PtrToNode List;
 
-List insert(int n,List l) {
-	List p = (List)malloc(sizeof(struct Node)*n);
-	l->Next = p;
-	for (int i = 0; i < n; i++) {
-		scanf("%d %d", &((p + i)->coef), &((i + p)->expon));
-		(p + 1)->Next= NULL;
-	}
-	(p + n - 1)->Next = NULL;
-	return l;
-};
-struct Node Node1,Node2;
-List L1 = &Node1,
-L2 = &Node2;
+typedef PtrNode List;
 
-void printlist(List l) {
-	l = l->Next;
-	while (l)
-	{
-		printf("%d-%d\n", l->coef, l->expon);
-		l = l->Next;
+PtrNode gnode(int coef, int expon) {
+	PtrNode p = (PtrNode)malloc(sizeof(struct Node));
+	if (p == NULL) {
+		return NULL;//assert (p != NULL);
 	}
-	return;
+	p->coef = coef;
+	p->expon = expon;
+	p->Next = NULL;
+	return p;
 }
 
-List mul(List a, List b) {
-	List l = (List)malloc(sizeof(struct Node));
-	l->Next = NULL;
-	List n1 = a->Next, n2 = b->Next, p = l;
-	while (n1) {
-		while (n2) {
-			p->Next = (PtrToNode)malloc(sizeof(struct Node));
-			p = p->Next;
-			p->expon = n1->expon + n2->expon;
-			p->coef = n1->coef*n2->coef;
-			p->Next = NULL;
-			n2 = n2->Next;
+char* gnum(char*cptr, char *word, size_t n) {
+	for (int i = 0; i<n - 1 && *cptr; i++) {
+		if (isdigit(*cptr) || *cptr == '-') {
+			*word++ = *cptr++;
 		}
-		n1 = n1->Next;
 	}
-	return l;
+	if (*cptr)
+		cptr++;
+	*word = 0;
+	return cptr;
 }
-int main()
-{	
-	int N;
-	scanf("%d", &N);
-	insert(N, L1);
-	scanf("%d", &N);
-	insert(N, L2);
-	mul(L1, L2);
-	system("pause");
+
+List gpoly(List *l) {
+	struct Node **p = l;
+	int coef, expon;
+	int n;
+	char bline[MAXLINE];
+	char word[MAXLINE];
+
+	char *cptr = bline;
+	fgets(bline, sizeof(bline), stdin);
+	cptr = gnum(cptr, word, MAXLINE);
+	n = atoi(word);
+	for (int i = 0; i<n; i++) {
+		//scanf("%d", &coef);
+		//scanf("%d", &expon);
+		cptr = gnum(cptr, word, MAXLINE);
+		coef = atoi(word);
+		cptr = gnum(cptr, word, MAXLINE);
+		expon = atoi(word);
+		*p = gnode(coef, expon);
+		(*p)->Next = NULL;
+		p = &(*p)->Next;
+	}
+	return *l;
+}
+
+List list_insert(List *l, int coef, int expon) {
+	PtrNode *p = l;
+
+	for (; *p;) {
+		if ((*p)->expon == expon) {
+			(*p)->coef += coef;
+			return *l;
+		}
+		else if ((*p)->expon > expon) {
+			p = &(*p)->Next;
+		}
+		else {
+			PtrNode n = gnode(coef, expon);
+			n->Next = *p;
+			*p = n;
+			return *l;
+		}
+	}
+	if (*p == NULL) {
+		*p = gnode(coef, expon);
+		return *l;
+	}
+
+	return *l;
+}
+
+List list_mul(List l1, List l2) {
+	List l3 = NULL;
+	int coef, expon;
+	for (PtrNode n1 = l1; n1; n1 = n1->Next) {
+		for (PtrNode n2 = l2; n2; n2 = n2->Next) {
+			coef = n1->coef * n2->coef;
+			expon = n1->expon + n2->expon;
+			if (coef != 0)
+				list_insert(&l3, coef, expon);
+		}
+	}
+	return l3;
+}
+
+List list_add(List l1, List l2) {
+	return NULL;
+}
+
+int main(int argc, char *argv[])
+{
+	List l1, l2;
+	gpoly(&l1);
+	for (PtrNode p = l1; p; p = p->Next) {
+		printf("%d x^%d + ", p->coef, p->expon);
+	}
+	printf("\n\n\n");
+	gpoly(&l2);
+	for (PtrNode p = l2; p; p = p->Next) {
+		printf("%d x^%d + ", p->coef, p->expon);
+	}
+	printf("\n");
+	printf("---------------------------\n");
+	List l3 = list_mul(l1, l2);
+	for (PtrNode p = l3; p; p = p->Next) {
+		printf("%d x^%d + ", p->coef, p->expon);
+	}
+	printf("\n");
+	return 0;
 }
