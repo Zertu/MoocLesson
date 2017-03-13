@@ -15,7 +15,7 @@ List insert(int n,List l) {
 	List p = (List)malloc(sizeof(struct Node)*n);
 	l->Next = p;
 	for (int i = 0; i < n; i++) {
-		scanf("%d %d", &(p+1)->coef, &(1+p)->expon);
+		scanf("%d %d", &((p + i)->coef), &((i + p)->expon));
 		(p + 1)->Next= NULL;
 	}
 	(p + n - 1)->Next = NULL;
@@ -27,7 +27,7 @@ L2 = &Node2;
 
 void printlist(List l) {
 	l = l->Next;
-	while (l->Next!=NULL)
+	while (l)
 	{
 		printf("%d-%d\n", l->coef, l->expon);
 		l = l->Next;
@@ -39,7 +39,6 @@ int main()
 	int N;
 	scanf("%d", &N);
 	insert(N, L1);
-	scanf("%d", &N);
-	insert(N, L2);
+	printlist(L1);
 	system("pause");
 }
